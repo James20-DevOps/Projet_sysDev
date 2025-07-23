@@ -21,9 +21,17 @@ pipeline {
                 // Add your test commands here
             }
         }
+        stage('Test integration') {
+            steps {
+                sh 'mvn verify' //test d'integration
+                echo '---------------- Running integration tests...'
+                
+            }
+        }
         stage('Deploy') {
             steps {
-                sh 'mvn deploy'
+                sh 'docker build -t student_age.py .'
+                sh 'docker run -d -p 5000:5000 student_age.py'
                 echo 'Deploying...'
                 // Add your deployment commands here
             }
