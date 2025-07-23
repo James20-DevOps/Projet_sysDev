@@ -18,7 +18,7 @@ pipeline {
                     python3 -m venv $VIRTUAL_ENV
                     source $VIRTUAL_ENV/bin/activate
                     pip install --upgrade pip
-                    pip install -r requirements.txt
+                    pip install -r simple_api/requirements.txt
                 '''
                 echo '✔️ Environnement Python prêt'
             }
@@ -37,8 +37,12 @@ pipeline {
         stage('Docker Deploy') {
             steps {
                 sh '''
-                    docker build -t student_age_app .
-                    docker run -d -p 5000:5000 student_age_app
+                    docker build -t student_age_app -f simple_api/Dockerfile simple_api
+                    if [ $(docker ps -q -f name=student_age_app) ]; then
+                        docker stop student_age_app
+                        docker rm student_age_app
+                    fi
+                    docker run -d -p 5000:5000 --name student_age_app student_age_app
                 '''
                 echo '✔️ Application Flask déployée avec Docker'
             }
@@ -50,10 +54,10 @@ pipeline {
             echo 'Pipeline terminé'
         }
         success {
-            echo 'Pipeline terminé avec succès '
+            echo 'Pipeline terminé avec succès'
         }
         failure {
-            echo 'Le pipeline a échoué '
+            echo 'Le pipeline a échoué'
         }
     }
 }
