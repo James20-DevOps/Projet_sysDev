@@ -1,4 +1,4 @@
-cd #!flask/bin/python
+#!flask/bin/python
 from flask import Flask, jsonify
 from flask import abort
 from flask import make_response
@@ -29,18 +29,18 @@ try:
     student_age_file_path
     student_age_file_path  = os.environ['student_age_file_path'] 
 except NameError:
-    student_age_file_path  = '/data/student_age.json'
+    student_age_file_path  = 'student_age.json'
 
 student_age_file = open(student_age_file_path, "r")
 student_age = json.load(student_age_file)
 
 @app.route('/pozos/api/v1.0/get_student_ages', methods=['GET'])
-@auth.login_required
+#@auth.login_required
 def get_student_ages():
     return jsonify({'student_ages': student_age })
 
 @app.route('/pozos/api/v1.0/get_student_ages/<student_name>', methods=['GET'])
-@auth.login_required
+#@auth.login_required
 def get_student_age(student_name):
     if student_name not in student_age :
         abort(404)
