@@ -1,52 +1,59 @@
 pipeline {
     agent any
 
+    environment {
+        VIRTUAL_ENV = 'venv'
+    }
+
     stages {
         stage('Checkout') {
             steps {
                 git 'https://github.com/James20-DevOps/Projet_sysDev.git'
-    }
-        }
-        stage('Build') {
-            steps {
-                sh 'mvn clean install'
-                echo '---------------- Building...'
-                // Add your build commands here
             }
         }
-        stage('Test') {
+
+        stage('Setup Python Environment') {
             steps {
-                sh 'mvn test'
-                echo 'Testing...'
-                // Add your test commands here
+                sh '''
+                    python3 -m venv $VIRTUAL_ENV
+                    source $VIRTUAL_ENV/bin/activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
+                echo '✔️ Environnement Python prêt'
             }
         }
-        stage('Test integration') {
+
+        stage('Run Unit Tests') {
             steps {
-                sh 'mvn verify' //test d'integration
-                echo '---------------- Running integration tests...'
-                
+                sh '''
+                    source $VIRTUAL_ENV/bin/activate
+                    python -m unittest discover -s tests
+                '''
+                echo '✔️ Tests unitaires exécutés'
             }
         }
-        stage('Deploy') {
+
+        stage('Docker Deploy') {
             steps {
-                sh 'docker build -t student_age.py .'
-                sh 'docker run -d -p 5000:5000 student_age.py'
-                echo 'Deploying...'
-                // Add your deployment commands here
+                sh '''
+                    docker build -t student_age_app .
+                    docker run -d -p 5000:5000 student_age_app
+                '''
+                echo '✔️ Application Flask déployée avec Docker'
             }
         }
     }
 
     post {
         always {
-            echo 'This will always run after the stages.'
+            echo 'Pipeline terminé'
         }
         success {
-            echo 'This will run only if the pipeline succeeds.'
+            echo 'Pipeline terminé avec succès '
         }
         failure {
-            echo 'This will run only if the pipeline fails.'
+            echo 'Le pipeline a échoué '
         }
     }
 }
