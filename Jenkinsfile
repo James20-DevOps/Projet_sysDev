@@ -4,16 +4,26 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
+                git 'https://github.com/James20-DevOps/Projet_sysDev.git'
     }
+        }
+        stage('Build') {
+            steps {
+                sh 'mvn clean install'
+                echo '---------------- Building...'
+                // Add your build commands here
+            }
         }
         stage('Test') {
             steps {
+                sh 'mvn test'
                 echo 'Testing...'
                 // Add your test commands here
             }
         }
         stage('Deploy') {
             steps {
+                sh 'mvn deploy'
                 echo 'Deploying...'
                 // Add your deployment commands here
             }
